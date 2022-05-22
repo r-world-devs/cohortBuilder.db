@@ -1,0 +1,32 @@
+Package: cohortBuilder.db
+Type: Package
+Title: cohortBuilder Methods for Database Source
+Version: 0.0.0.9037
+Authors@R: 
+    c(person('Krystian', 'Igras', 
+             email = 'krystian8207@gmail.com', 
+             role = c('cre', 'aut'))
+    )
+Maintainer: The package maintainer <krystian8207@gmail.com>
+Description: Add methods allowing to set up database source and apply filtering to it.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    yaml,
+    purrr,
+    dplyr (>= 1.0.0),
+    tidyr,
+    magrittr,
+    glue,
+    R6,
+    RPostgres,
+    dbplyr,
+    cohortBuilder (>= 0.0.0.9037),
+    shinyCohortBuilder (>= 0.0.0.9037)
+RoxygenNote: 7.1.2
+KeepSource: true
+Suggests: 
+    shiny,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
