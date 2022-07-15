@@ -4,6 +4,7 @@
 \alias{source-layer}
 \alias{.init_step.db}
 \alias{.pre_filtering.db}
+\alias{.post_binding.db}
 \alias{.collect_data.db}
 \alias{.get_stats.db}
 \title{Source compatibility methods for "db" layer.}
@@ -11,6 +12,8 @@
 \method{.init_step}{db}(source)
 
 \method{.pre_filtering}{db}(source, data_object, step_id)
+
+\method{.post_binding}{db}(source, data_object, step_id)
 
 \method{.collect_data}{db}(source, data_object)
 
