@@ -22,11 +22,12 @@ Imports:
     R6,
     RPostgres,
     dbplyr,
-    cohortBuilder (>= 0.0.0.9037),
-    shinyCohortBuilder (>= 0.0.0.9037)
+    cohortBuilder (>= 0.1.1),
+    shinyCohortBuilder (>= 0.1)
 RoxygenNote: 7.1.2
 KeepSource: true
 Suggests: 
     shiny,
+    RSQLite,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

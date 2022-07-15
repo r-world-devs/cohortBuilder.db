@@ -1,4 +1,5 @@
 library(testthat)
-library(cohortBuilder.fk)
+library(cohortBuilder)
+library(cohortBuilder.db)
 
-test_check("cohortBuilder")
+test_check("cohortBuilder.db")
