@@ -1,8 +1,9 @@
-#' Date range filter definition
+#' Filters definition
 #'
-#' This is a method for cohortBuilder [cb_filter.date_range()] generic.
-#' It creates 'date_range' filter type definition for specified table database connection.
+#' Methods used for configuration of specific filter types for `dbtables` source.
 #'
+#' @inheritParams cohortBuilder::cb_filter.date_range.tblist
+#' @rdname filter-source-types
 #' @export
 cb_filter.date_range.db <- function(
   source, type = "date_range", id = .gen_id(), name = id, variable, range = NA,
@@ -16,23 +17,22 @@ cb_filter.date_range.db <- function(
     input_param = "range",
     filter_data = function(data_object) {
 
-      selected_value <- range # code include
-      if (keep_na && !identical(selected_value, NA)) {
+      if (keep_na && !identical(range, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter((!!sym(variable) <= !!selected_value[2] & !!sym(variable) >= !!selected_value[1]) | is.na(!!sym(variable)))
+          dplyr::filter((!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1]) | is.na(!!sym(variable)))
         # keep_na !value_na end
       }
-      if (!keep_na && identical(selected_value, NA)) {
+      if (!keep_na && identical(range, NA)) {
         # !keep_na value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(!is.na(!!sym(variable)))
         # !keep_na value_na end
       }
-      if (!keep_na && !identical(selected_value, NA)) {
+      if (!keep_na && !identical(range, NA)) {
         # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) <= !!selected_value[2] & !!sym(variable) >= !!selected_value[1])
+          dplyr::filter(!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1])
         # !keep_na !value_na end
       }
       attr(data_object[[dataset]], "filtered") <- TRUE # code include

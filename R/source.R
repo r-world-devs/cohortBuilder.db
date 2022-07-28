@@ -56,7 +56,7 @@ set_source.db <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 #' @name source-layer
 #' @export
 .init_step.db <- function(source) {
-  purrr::map(
+  init_tbls <- purrr::map(
     stats::setNames(source$dtconn$tables, source$dtconn$tables),
     function(table) {
       tbl_conn <- dplyr::tbl(
@@ -66,6 +66,7 @@ set_source.db <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
       tbl_conn
     }
   )
+  init_tbls
 }
 
 tmp_table_name <- function(name, suffix) {

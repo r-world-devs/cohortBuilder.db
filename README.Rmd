@@ -25,6 +25,7 @@ options(tibble.width = Inf)
 iris <- tibble::as.tibble(iris)
 options("tibble.print_max" = 5)
 options("tibble.print_min" = 5)
+pkg_version <- read.dcf("DESCRIPTION", fields = "Version")[1, 1]
 ```
 
 # cohortBuilder.db <img src="man/figures/logo.png" align="right" width="120" />
@@ -34,7 +35,7 @@ The package allows you to operate with `cohortBuilder` API on remote tables stor
 
 All of the operations are performed directly on the database server side!
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.0.0.9026&color=ff69b4)](https://github.io/r-world-devs/cohortBuilder.db/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.`r I(pkg_version)`&color=ff69b4)](https://github.io/r-world-devs/cohortBuilder.db/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Installation

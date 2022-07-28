@@ -13,18 +13,22 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
+    rlang,
     yaml,
+    tibble,
     purrr,
     dplyr (>= 1.0.0),
     tidyr,
     magrittr,
     glue,
     R6,
+    DBI,
     RPostgres,
     dbplyr,
     cohortBuilder (>= 0.1.1),
+    shinyWidgets,
     shinyCohortBuilder (>= 0.1)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 KeepSource: true
 Suggests: 
     shiny,
