@@ -7,7 +7,7 @@ Authors@R:
              email = 'krystian8207@gmail.com', 
              role = c('cre', 'aut'))
     )
-Maintainer: The package maintainer <krystian8207@gmail.com>
+Maintainer: Krystian Igras <krystian8207@gmail.com>
 Description: Add methods allowing to set up database source and apply filtering to it.
 License: MIT + file LICENSE
 Encoding: UTF-8

@@ -46,7 +46,7 @@ cb_filter.discrete_text.db <- function(
           res <- data_object[[dataset]] %>%
             dplyr::select(!!sym(variable)) %>%
             dplyr::filter(!is.na(!!sym(variable))) %>%
-            dplyr::summarise(n = n()) %>%
+            dplyr::summarise(n = dplyr::n()) %>%
             dplyr::collect()
           as.integer(res$n)
         },
@@ -54,7 +54,7 @@ cb_filter.discrete_text.db <- function(
           res <- data_object[[dataset]] %>%
             dplyr::select(!!sym(variable)) %>%
             dplyr::filter(is.na(!!sym(variable))) %>%
-            dplyr::summarise(n = n()) %>%
+            dplyr::summarise(n = dplyr::n()) %>%
             dplyr::collect()
           as.integer(res$n)
         }
@@ -67,9 +67,9 @@ cb_filter.discrete_text.db <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {

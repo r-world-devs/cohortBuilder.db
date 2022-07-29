@@ -18,7 +18,7 @@ group_filters_db <- function(source, filters) {
 
 dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
   stats_id <- ns(paste0(step_id, "-stats_", dataset_name))
-  tagList(
+  shiny::tagList(
     shiny::tags$strong(dataset_name),
     shiny::htmlOutput(stats_id, inline = TRUE, style = "float: right;"),
     shiny::tags$hr(style = "margin-top: 0.3rem;"),
@@ -44,7 +44,7 @@ dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
 
   group_filters_db(cohort$get_source(), step$filters) %>%
     purrr::imap(~ dataset_filters_db(.x, .y, step_id, cohort, ns = ns)) %>%
-    div(class = "cb_filters", `data-step_id` = step_id)
+    shiny::div(class = "cb_filters", `data-step_id` = step_id)
 }
 
 #' Update data statistics method for db source
@@ -125,7 +125,7 @@ drop_nulls <- function(x) {
 rule_character <- function(table_conn, name, dataset_name) {
   stat <- table_conn %>%
     dplyr::select(col = dplyr::sym(!!name)) %>%
-    dplyr::summarise(n = n(), unique = dplyr::n_distinct(col)) %>%
+    dplyr::summarise(n = dplyr::n(), unique = dplyr::n_distinct(col)) %>%
     dplyr::collect()
 
   type <- "discrete"
@@ -152,7 +152,7 @@ rule_character <- function(table_conn, name, dataset_name) {
 rule_factor <- function(table_conn, name, dataset_name) {
   stat <- table_conn %>%
     dplyr::select(col = dplyr::sym(!!name)) %>%
-    dplyr::summarise(n = n(), unique = dplyr::n_distinct(col)) %>%
+    dplyr::summarise(n = dplyr::n(), unique = dplyr::n_distinct(col)) %>%
     dplyr::collect()
 
   type <- "discrete"
@@ -212,7 +212,7 @@ filter_rule <- function(name, type, dataset_name, table_conn) {
 }
 
 filter_rules <- function(table_conn, dataset_name) {
-  tbl_spec <- dplyr::collect(head(table_conn, 0))
+  tbl_spec <- dplyr::collect(utils::head(table_conn, 0))
   tbl_spec %>%
     purrr::imap(
       ~ filter_rule(.y, class(.y), dataset_name = dataset_name, table_conn = table_conn)

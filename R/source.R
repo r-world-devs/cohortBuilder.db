@@ -124,7 +124,7 @@ tmp_table_name <- function(name, suffix) {
     purrr::map(
       ~ list(
         n_rows = data_object[[.x]] %>%
-          dplyr::summarise(n = n()) %>%
+          dplyr::summarise(n = dplyr::n()) %>%
           dplyr::collect() %>%
           dplyr::pull(n) %>%
           as.integer()

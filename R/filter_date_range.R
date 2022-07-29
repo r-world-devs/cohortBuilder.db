@@ -45,7 +45,7 @@ cb_filter.date_range.db <- function(
 
       extra_params <- list(...)
       nrows <- data_object[[dataset]] %>% # todo can we compute it once per dataset? Having 3 such filter we'll do it 3 times.
-        dplyr::summarise(n = n()) %>%
+        dplyr::summarise(n = dplyr::n()) %>%
         dplyr::collect() %>%
         dplyr::pull(n) %>%
         as.integer()
@@ -135,9 +135,9 @@ cb_filter.date_range.db <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {

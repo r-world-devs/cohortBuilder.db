@@ -6,7 +6,10 @@
 #' @import cohortBuilder
 #' @import shinyCohortBuilder
 
-globalVariables(c(":=", "!!", ".data"))
+globalVariables(c(
+  ":=", "!!", ".data", "name", "id",
+  "dataset", "n", "count", "tmp_level", "level"
+))
 
 NULL
 
