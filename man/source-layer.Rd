@@ -7,6 +7,9 @@
 \alias{.post_binding.db}
 \alias{.collect_data.db}
 \alias{.get_stats.db}
+\alias{.run_binding.db}
+\alias{.get_attrition_label.db}
+\alias{.get_attrition_count.db}
 \title{Source compatibility methods for "db" layer.}
 \usage{
 \method{.init_step}{db}(source)
@@ -18,6 +21,12 @@
 \method{.collect_data}{db}(source, data_object)
 
 \method{.get_stats}{db}(source, data_object)
+
+\method{.run_binding}{db}(source, binding_key, data_object_pre, data_object_post, ...)
+
+\method{.get_attrition_label}{db}(source, step_id, step_filters, dataset, ...)
+
+\method{.get_attrition_count}{db}(source, data_stats, dataset, ...)
 }
 \arguments{
 \item{source}{Source object of "db" type.}
@@ -26,6 +35,17 @@
 For "db" source it's a list of connections to temporary tables in connected database.}
 
 \item{step_id}{Id of the currently used step.}
+
+\item{binding_key}{Binding key definition. See \link[cohortBuilder]{binding-keys}.}
+
+\item{data_object_pre, data_object_post}{Version of \code{data_object} before and after
+filtering in the step was applied.}
+
+\item{step_filters}{List of step filters.}
+
+\item{dataset}{Dataset name to present attrition for.}
+
+\item{data_stats}{Data frame presenting statistics for each filtering step.}
 }
 \description{
 These are methods for `cohortBuilder` generics used for integrity between source layers.

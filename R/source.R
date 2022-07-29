@@ -51,6 +51,9 @@ set_source.db <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 #' @param source Source object of "db" type.
 #' @param data_object Object that allows source data access.
 #'   For "db" source it's a list of connections to temporary tables in connected database.
+#' @param data_object_pre,data_object_post Version of \code{data_object} before and after
+#'   filtering in the step was applied.
+#' @param binding_key Binding key definition. See \link[cohortBuilder]{binding-keys}.
 #' @param step_id Id of the currently used step.
 #'
 #' @name source-layer
@@ -133,6 +136,7 @@ tmp_table_name <- function(name, suffix) {
     stats::setNames(dataset_names)
 }
 
+#' @rdname source-layer
 #' @export
 .run_binding.db <- function(source, binding_key, data_object_pre, data_object_post, ...) {
   binding_dataset <- binding_key$update$dataset
@@ -178,8 +182,13 @@ tmp_table_name <- function(name, suffix) {
   return(data_object_post)
 }
 
+#' @param step_filters List of step filters.
+#' @param dataset Dataset name to present attrition for.
+#' @param data_stats Data frame presenting statistics for each filtering step.
+#' @rdname source-layer
 #' @export
 .get_attrition_label.db <- `%:::%`("cohortBuilder", ".get_attrition_label.tblist")
 
+#' @rdname source-layer
 #' @export
 .get_attrition_count.db <- `%:::%`("cohortBuilder", ".get_attrition_count.tblist")
