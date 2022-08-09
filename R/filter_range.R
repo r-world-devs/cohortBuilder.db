@@ -1,8 +1,5 @@
-#' Range filter definition
-#'
-#' This is a method for cohortBuilder [cb_filter.range()] generic.
-#' It creates 'range' filter type definition for specified table database connection.
-#'
+#' @inheritParams cohortBuilder::cb_filter.range.tblist
+#' @rdname filter-source-types
 #' @export
 cb_filter.range.db <- function(
   source, type = "range", id = .gen_id(), name = id, variable, range = NA, dataset,
@@ -16,23 +13,22 @@ cb_filter.range.db <- function(
     input_param = "range",
     filter_data = function(data_object) {
 
-      selected_value <- range # code include
-      if (keep_na && !identical(selected_value, NA)) {
+      if (keep_na && !identical(range, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter((!!sym(variable) <= !!selected_value[2] & !!sym(variable) >= !!selected_value[1]) | is.na(!!sym(variable)))
+          dplyr::filter((!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1]) | is.na(!!sym(variable)))
         # keep_na !value_na end
       }
-      if (!keep_na && identical(selected_value, NA)) {
+      if (!keep_na && identical(range, NA)) {
         # !keep_na value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(!is.na(!!sym(variable)))
         # !keep_na value_na end
       }
-      if (!keep_na && !identical(selected_value, NA)) {
+      if (!keep_na && !identical(range, NA)) {
         # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) <= !!selected_value[2] & !!sym(variable) >= !!selected_value[1])
+          dplyr::filter(!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1])
         # !keep_na !value_na end
       }
       attr(data_object[[dataset]], "filtered") <- TRUE # code include
@@ -44,7 +40,7 @@ cb_filter.range.db <- function(
       }
       extra_params <- list(...)
       nrows <- data_object[[dataset]] %>%
-        dplyr::summarise(n = n()) %>%
+        dplyr::summarise(n = dplyr::n()) %>%
         dplyr::collect() %>%
         dplyr::pull(n) %>%
         as.integer()
@@ -139,9 +135,9 @@ cb_filter.range.db <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
