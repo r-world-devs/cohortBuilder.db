@@ -94,6 +94,7 @@ cb_filter.date_range.db <- function(
 
           per_date_counts <- data_object[[dataset]] %>%
             dplyr::select(!!sym(variable)) %>%
+            dplyr::filter(!is.na(!!sym(variable))) %>%
             dplyr::group_by(!!sym(variable)) %>%
             dplyr::summarise(
               count = dplyr::n()

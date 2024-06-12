@@ -18,15 +18,15 @@ group_filters_db <- function(source, filters) {
 
 dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
   stats_id <- ns(paste0(step_id, "-stats_", dataset_name))
-  shiny::tagList(
+  shiny::div(
+    class = "cb_filters_group",
     shiny::tags$strong(dataset_name),
     shiny::htmlOutput(stats_id, inline = TRUE, style = "float: right;"),
     shiny::tags$hr(style = "margin-top: 0.3rem;"),
     filters %>%
       purrr::map(
         ~ shinyCohortBuilder::.render_filter(.x, step_id, cohort, ns = ns)
-      ),
-    shiny::div(style = "padding-top: 1rem; padding-bottom: 1rem;")
+      )
   )
 }
 
@@ -43,6 +43,7 @@ dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
   step <- cohort$get_step(step_id)
 
   group_filters_db(cohort$get_source(), step$filters) %>%
+    purrr::keep(~length(.x) > 0) %>%
     purrr::imap(~ dataset_filters_db(.x, .y, step_id, cohort, ns = ns)) %>%
     shiny::div(class = "cb_filters", `data-step_id` = step_id)
 }

@@ -92,6 +92,7 @@ cb_filter.range.db <- function(
 
           data_object[[dataset]] %>%
             dplyr::select(!!sym(variable)) %>%
+            dplyr::filter(!is.na(!!sym(variable))) %>%
             dplyr::mutate(
               tmp_level = floor((!!sym(variable) - !!min(breaks)) / (!!breaks[2] - !!breaks[1])) + 1,
               level = ifelse(!!sym(variable) == !!max_val, !!length(breaks), tmp_level)
