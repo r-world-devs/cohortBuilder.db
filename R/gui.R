@@ -22,7 +22,7 @@ dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
     class = "cb_filters_group",
     shiny::tags$strong(dataset_name),
     shiny::htmlOutput(stats_id, inline = TRUE, style = "float: right;"),
-    shiny::tags$hr(style = "margin-top: 0.3rem;"),
+    shiny::tags$hr(style = "margin-top: 0.3rem; margin-bottom: 0.3rem;"),
     filters %>%
       purrr::map(
         ~ shinyCohortBuilder::.render_filter(.x, step_id, cohort, ns = ns)
@@ -58,7 +58,7 @@ dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
 #' @name updating-data-statistics
 #' @export
 .update_data_stats.db <- function(source, step_id, cohort, session) {
-  stats <- cohort$dtconn$stats
+  stats <- cohort$attributes$stats
 
   dataset_names <- source$dtconn$tables
   dataset_names %>% purrr::walk(
@@ -71,7 +71,8 @@ dataset_filters_db <- function(filters, dataset_name, step_id, cohort, ns) {
         }
         current <- cohort$get_cache(step_id, state = "post")[[.x]]$n_rows
         shinyCohortBuilder::.pre_post_stats(current, previous, percent = TRUE, stats = stats)
-      })
+      }),
+      session
     )
   )
 }

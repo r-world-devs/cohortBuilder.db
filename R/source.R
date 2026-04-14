@@ -126,11 +126,7 @@ tmp_table_name <- function(name, suffix) {
   dataset_names %>%
     purrr::map(
       ~ list(
-        n_rows = data_object[[.x]] %>%
-          dplyr::summarise(n = dplyr::n()) %>%
-          dplyr::collect() %>%
-          dplyr::pull(n) %>%
-          as.integer()
+        n_rows = 0
       )
     ) %>%
     stats::setNames(dataset_names)
