@@ -10,7 +10,7 @@ tables stores within a database.
 All of the operations are performed directly on the database server
 side!
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.0.0.9026&color=ff69b4)](https://github.io/r-world-devs/cohortBuilder.db/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.1.1&color=ff69b4)](https://github.com/r-world-devs/cohortBuilder.db)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Installation

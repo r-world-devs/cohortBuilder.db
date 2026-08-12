@@ -1,10 +1,9 @@
-#' @inheritParams cohortBuilder::cb_filter.discrete.tblist
-#'
+#' @inheritParams cohortBuilder::cb_filter.discrete_text.tblist
 #' @rdname filter-source-types
 #' @export
-cb_filter.discrete.db <- function(
+cb_filter.discrete_text.db <- function(
   source, type = "discrete", id = .gen_id(), name = id, variable, value = NA,
-  dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+  dataset, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -14,23 +13,16 @@ cb_filter.discrete.db <- function(
     input_param = "value",
     filter_data = function(data_object) {
 
-      if (keep_na && !identical(value, NA)) {
-        # keep_na !value_na start
+      if (!identical(value, NA)) {
+        # keep_na !value_na start, # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) %in% !!c(value) | is.na(!!sym(variable)))
-        # keep_na !value_na end
-      }
-      if (!keep_na && identical(value, NA)) {
-        # !keep_na value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!is.na(!!sym(variable)))
-        # !keep_na value_na end
-      }
-      if (!keep_na && !identical(value, NA)) {
-        # !keep_na !value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) %in% !!value)
-        # !keep_na !value_na end
+          dplyr::filter(
+            !!sym(variable) %in% !!strsplit(
+              sub(" ", "", value, fixed = TRUE),
+              split = ",", fixed = TRUE
+            )[[1]]
+          )
+        # keep_na !value_na end, # !keep_na !value_na end
       }
       attr(data_object[[dataset]], "filtered") <- TRUE # code include
       return(data_object)
@@ -46,9 +38,9 @@ cb_filter.discrete.db <- function(
             dplyr::select(!!sym(variable)) %>%
             dplyr::filter(!is.na(!!sym(variable))) %>%
             dplyr::group_by(!!sym(variable)) %>%
-            dplyr::summarise(n = dplyr::n()) %>%
+            dplyr::summarise(n = 1) %>%
             dplyr::collect()
-          stats::setNames(as.integer(res$n), res[[variable]])
+          paste(res[[variable]], collapse = ",")
         },
         n_data = if ("n_data" %in% name) {
           res <- data_object[[dataset]] %>%
@@ -85,7 +77,6 @@ cb_filter.discrete.db <- function(
         dataset = dataset,
         variable = variable,
         value = value,
-        keep_na = keep_na,
         description = description,
         active = active,
         ...
