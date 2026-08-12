@@ -10,9 +10,10 @@
 \alias{.run_binding.db}
 \alias{.get_attrition_label.db}
 \alias{.get_attrition_count.db}
+\alias{.repro_code_tweak.db}
 \title{Source compatibility methods for "db" layer.}
 \usage{
-\method{.init_step}{db}(source)
+\method{.init_step}{db}(source, ...)
 
 \method{.pre_filtering}{db}(source, data_object, step_id)
 
@@ -27,12 +28,16 @@
 \method{.get_attrition_label}{db}(source, step_id, step_filters, dataset, ...)
 
 \method{.get_attrition_count}{db}(source, data_stats, dataset, ...)
+
+\method{.repro_code_tweak}{db}(source, code_data)
 }
 \arguments{
 \item{source}{Source object of "db" type.}
 
+\item{...}{Extra arguments passed to a specific method.}
+
 \item{data_object}{Object that allows source data access.
-For "db" source it's a list of connections to temporary tables in connected database.}
+For "db" source it's a list of connections to (temporary) tables in the connected database.}
 
 \item{step_id}{Id of the currently used step.}
 
@@ -46,6 +51,17 @@ filtering in the step was applied.}
 \item{dataset}{Dataset name to present attrition for.}
 
 \item{data_stats}{Data frame presenting statistics for each filtering step.}
+
+\item{code_data}{Data frame collecting the reproducible-code expressions.}
+}
+\value{
+- `.init_step.db`, `.pre_filtering.db`, `.post_binding.db`: a named list of
+  `dbplyr` table connections (the `data_object`).
+- `.collect_data.db`: a named list of collected (in-memory) tibbles.
+- `.get_stats.db`: a named list of per-dataset statistics (`n_rows`).
+- `.run_binding.db`: the updated `data_object_post`.
+- `.get_attrition_label.db` / `.get_attrition_count.db`: attrition label and
+  count (reused from the `tblist` implementation).
 }
 \description{
 These are methods for `cohortBuilder` generics used for integrity between source layers.

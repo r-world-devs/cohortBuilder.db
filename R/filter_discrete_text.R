@@ -1,94 +1,111 @@
-#' @inheritParams cohortBuilder::cb_filter.discrete_text.tblist
-#' @rdname filter-source-types
-#' @export
-cb_filter.discrete_text.db <- function(
-  source, type = "discrete", id = .gen_id(), name = id, variable, value = NA,
-  dataset, ..., description = NULL, active = TRUE) {
-  args <- list(...)
+#' Discrete text filter methods for the `db` source
+#'
+#' S7 methods implementing the `discrete_text` filter for a `dbtables` source.
+#' They dispatch on `list(CbFilterDiscreteText, db_class)`.
+#'
+#' @name db-filter-discrete-text
+#' @return See [db-filter-discrete].
+NULL
 
-  def_filter(
-    type = type,
-    id = id,
-    name = name,
-    input_param = "value",
-    filter_data = function(data_object) {
+S7::method(
+  cb_filter_data,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  value <- cohortBuilder::cb_intersect_domain(filter)
 
-      if (!identical(value, NA)) {
-        # keep_na !value_na start, # !keep_na !value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(
-            !!sym(variable) %in% !!strsplit(
-              sub(" ", "", value, fixed = TRUE),
-              split = ",", fixed = TRUE
-            )[[1]]
-          )
-        # keep_na !value_na end, # !keep_na !value_na end
-      }
-      attr(data_object[[dataset]], "filtered") <- TRUE # code include
-      return(data_object)
-    },
-    get_stats = function(data_object, name) {
-      if (missing(name)) {
-        name <- c("n_data", "choices", "n_missing")
-      }
-      # todo sometimes we don't need stats, maybe let's distinct stats_choices from choices (or even nothing if we define choices in filter definition)
-      stats <- list(
-        choices = if ("choices" %in% name) {
-          res <- data_object[[dataset]] %>%
-            dplyr::select(!!sym(variable)) %>%
-            dplyr::filter(!is.na(!!sym(variable))) %>%
-            dplyr::group_by(!!sym(variable)) %>%
-            dplyr::summarise(n = 1) %>%
-            dplyr::collect()
-          paste(res[[variable]], collapse = ",")
-        },
-        n_data = if ("n_data" %in% name) {
-          res <- data_object[[dataset]] %>%
-            dplyr::select(!!sym(variable)) %>%
-            dplyr::filter(!is.na(!!sym(variable))) %>%
-            dplyr::summarise(n = dplyr::n()) %>%
-            dplyr::collect()
-          as.integer(res$n)
-        },
-        n_missing = if ("n_missing" %in% name) {
-          res <- data_object[[dataset]] %>%
-            dplyr::select(!!sym(variable)) %>%
-            dplyr::filter(is.na(!!sym(variable))) %>%
-            dplyr::summarise(n = dplyr::n()) %>%
-            dplyr::collect()
-          as.integer(res$n)
-        }
-      )
-      if (length(name) == 1) {
-        return(stats[[name]])
-      } else {
-        return(stats)
-      }
-    },
-    plot_data = function(data_object) {
-      if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
-      } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
-      }
-    },
-    get_params = function(name) {
-      params <- list(
-        dataset = dataset,
-        variable = variable,
-        value = value,
-        description = description,
-        active = active,
-        ...
-      )
-      if (!missing(name)) return(params[[name]])
-      return(params)
-    },
-    get_data = function(data_object) {
-      data_object[[dataset]][[variable]]
-    },
-    get_defaults = function(data_object, cache_object) {
-      list(value = names(cache_object$choices))
+  if (!identical(value, NA)) {
+    values <- trimws(strsplit(value, split = ",")[[1]])
+    data_object[[dataset]] <- data_object[[dataset]] %>%
+      dplyr::filter(!!sym(variable) %in% !!values)
+  }
+  attr(data_object[[dataset]], "filtered") <- TRUE
+  data_object
+}
+
+S7::method(
+  cb_get_filter_stats,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, name, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  if (missing(name)) {
+    name <- c("n_data", "choices", "n_missing")
+  }
+
+  distinct_vals <- data_object[[dataset]] %>%
+    dplyr::select(!!sym(variable)) %>%
+    dplyr::filter(!is.na(!!sym(variable))) %>%
+    dplyr::distinct() %>%
+    dplyr::collect() %>%
+    dplyr::pull(1)
+
+  stats <- list(
+    choices = if ("choices" %in% name) paste(distinct_vals, collapse = ","),
+    n_data = if ("n_data" %in% name) length(distinct_vals),
+    n_missing = if ("n_missing" %in% name) {
+      res <- data_object[[dataset]] %>%
+        dplyr::select(!!sym(variable)) %>%
+        dplyr::filter(is.na(!!sym(variable))) %>%
+        dplyr::summarise(n = dplyr::n()) %>%
+        dplyr::collect()
+      as.integer(res$n)
     }
   )
+  if (length(name) == 1) stats[[name]] else stats[name]
+}
+
+S7::method(
+  cb_plot_filter_data,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, ...) {
+  invisible(NULL)
+}
+
+S7::method(
+  cb_get_filter_data,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, ...) {
+  data_object[[filter@dataset]] %>%
+    dplyr::select(!!sym(filter@variable))
+}
+
+S7::method(
+  cb_get_filter_defaults,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, cache_object, ...) {
+  list(value = cache_object$choices)
+}
+
+S7::method(
+  cb_filter_to_expr,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  value <- cohortBuilder::cb_intersect_domain(filter)
+
+  if (!identical(value, NA)) {
+    values <- trimws(strsplit(value, split = ",")[[1]])
+    rlang::expr({
+      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+        dplyr::filter(!!sym(variable) %in% !!values)
+    })
+  } else {
+    NULL
+  }
+}
+
+S7::method(
+  cb_domain_from_data,
+  list(CbFilterDiscreteText, db_class)
+) <- function(filter, source, data_object, ...) {
+  res <- data_object[[filter@dataset]] %>%
+    dplyr::select(!!sym(filter@variable)) %>%
+    dplyr::filter(!is.na(!!sym(filter@variable))) %>%
+    dplyr::distinct() %>%
+    dplyr::collect()
+  values <- as.character(res[[filter@variable]])
+  paste(values, collapse = ",")
 }

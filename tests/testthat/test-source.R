@@ -37,8 +37,8 @@ test_that("Filtering works fine", {
   run(coh)
   expect_equal(unique(coh$get_data(1, state = "post", collect = TRUE)$books$author), "Dan Brown")
   expect_equal(
-    coh$get_data(1, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_1")
+    dbplyr::remote_name(coh$get_data(1, state = "post", collect = FALSE)$books),
+    "books_1"
   )
 
   # multiple steps
@@ -56,12 +56,12 @@ test_that("Filtering works fine", {
   expect_equal(unique(coh$get_data(1, state = "post", collect = TRUE)$books$author), "Dan Brown")
   expect_equal(unique(coh$get_data(2, state = "post", collect = TRUE)$borrowers$program), c("premium", NA))
   expect_equal(
-    coh$get_data(1, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_1")
+    dbplyr::remote_name(coh$get_data(1, state = "post", collect = FALSE)$books),
+    "books_1"
   )
   expect_equal(
-    coh$get_data(2, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_2")
+    dbplyr::remote_name(coh$get_data(2, state = "post", collect = FALSE)$books),
+    "books_2"
   )
 })
 

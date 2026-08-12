@@ -1,7 +1,7 @@
 Package: cohortBuilder.db
 Type: Package
 Title: cohortBuilder Methods for Database Source
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: 
     c(person('Krystian', 'Igras', 
              email = 'krystian8207@gmail.com', 
@@ -14,24 +14,22 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     rlang,
-    yaml,
     tibble,
     purrr,
     dplyr (>= 1.0.0),
-    tidyr,
     magrittr,
     glue,
-    R6,
+    S7,
     DBI,
-    RPostgres,
     dbplyr,
-    cohortBuilder (>= 0.1.1),
+    cohortBuilder (>= 1.0.0),
     shinyWidgets,
-    shinyCohortBuilder (>= 0.1)
-RoxygenNote: 7.2.1
+    shinyCohortBuilder (>= 1.0.0)
+RoxygenNote: 7.3.3
 KeepSource: true
 Suggests: 
     shiny,
     RSQLite,
+    RPostgres,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

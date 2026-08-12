@@ -25,11 +25,16 @@ Should be created with \link{dbtables}.}
 When provided, used as a part of reproducible code output.}
 
 \item{description}{A named list storing the source objects description.
-Can be accessed with \link{description} Cohort method.}
+Can be accessed with \link[cohortBuilder]{description} Cohort method.}
 
-\item{...}{Source type specific parameters. Available in `attributes` list of resulting object.}
+\item{...}{Source type specific parameters passed to
+\link[cohortBuilder]{set_source} (e.g. `available_filters`,
+`compute_meta_stats`).}
+}
+\value{
+Object of class `c("db", "Source", "R6")`.
 }
 \description{
-This is a method for cohortBuilder [set_source()] generic.
+This is a method for cohortBuilder [cohortBuilder::set_source()] generic.
 It creates Source object which is based on connection to database tables.
 }

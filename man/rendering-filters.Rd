@@ -5,7 +5,7 @@
 \alias{.render_filters.db}
 \title{Filters rendering method for db source}
 \usage{
-\method{.render_filters}{db}(source, cohort, step_id, ns)
+\method{.render_filters}{db}(source, cohort, step_id, ns, ...)
 }
 \arguments{
 \item{source}{Source object of db type.}
@@ -15,6 +15,11 @@
 \item{step_id}{Id of the filtering step.}
 
 \item{ns}{Namespace function.}
+
+\item{...}{Extra arguments passed to a specific method.}
+}
+\value{
+A `shiny.tag` containing the rendered filters panel.
 }
 \description{
 Filters rendering method for db source

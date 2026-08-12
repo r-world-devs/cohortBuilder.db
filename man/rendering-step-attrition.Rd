@@ -2,12 +2,12 @@
 % Please edit documentation in R/gui.R
 \name{.step_attrition.db}
 \alias{.step_attrition.db}
-\title{Generate output of attrition plot}
+\title{Generate output of attrition plot for db source}
 \usage{
 \method{.step_attrition}{db}(source, id, cohort, session, ...)
 }
 \arguments{
-\item{source}{Source object.}
+\item{source}{Source object of db type.}
 
 \item{id}{Id of attrition output.}
 
@@ -19,21 +19,8 @@
 }
 \value{
 List of two objects: `render` and `output` defining rendering and
-    output placeholder for step attrition plot feature.
+    output placeholder for the step attrition plot feature.
 }
 \description{
-The method should return list of two object:
-\itemize{
-  \item{render}{ Rendering expression of attrition output.}
-  \item{output}{ Output expression related to rendering (with id equal to `id` parameter).}
-}
-For example:
-\preformatted{
-  list(
-    render = shiny::renderPlot({
-      cohort$show_attrition()
-    }),
-    output = shiny::plotOutput(id)
-  )
-}
+Generate output of attrition plot for db source
 }

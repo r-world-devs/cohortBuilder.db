@@ -1,5 +1,5 @@
 library(magrittr)
-library(RPostgres)
+library(RSQLite)
 library(cohortBuilder)
 library(shinyCohortBuilder)
 library(cohortBuilder.db)
