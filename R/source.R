@@ -106,42 +106,28 @@ create_data_object <- function(source) {
   create_data_object(source)
 }
 
-tmp_table_name <- function(name, suffix) {
-  paste0(name, "_", suffix)
-}
-
+#' @details
+#' `.pre_filtering.db` and `.post_binding.db` delegate to the strategy selected
+#' by the `cohortBuilder.db.step_strategy` option. See \link{step-strategy}.
 #' @rdname source-layer
 #' @export
 .pre_filtering.db <- function(source, data_object, step_id) {
-  purrr::map(
-    stats::setNames(source$dtconn$tables, source$dtconn$tables),
-    function(table) {
-      DBI::dbRemoveTable(
-        source$dtconn$connection,
-        name = tmp_table_name(table, step_id),
-        temporary = TRUE,
-        fail_if_missing = FALSE
-      )
-      attr(data_object[[table]], "filtered") <- FALSE
-      data_object[[table]]
-    }
+  switch(
+    step_strategy(),
+    lazy = pre_filtering_lazy(source, data_object, step_id),
+    materialize = pre_filtering_materialize(source, data_object, step_id),
+    materialize_selective = pre_filtering_materialize_selective(source, data_object, step_id)
   )
 }
 
 #' @rdname source-layer
 #' @export
 .post_binding.db <- function(source, data_object, step_id) {
-  purrr::map(
-    stats::setNames(source$dtconn$tables, source$dtconn$tables),
-    function(table) {
-      tbl_filtered <- attr(data_object[[table]], "filtered")
-      data_object[[table]] <- dplyr::compute(
-        data_object[[table]],
-        name = tmp_table_name(table, step_id)
-      )
-      attr(data_object[[table]], "filtered") <- tbl_filtered
-      data_object[[table]]
-    }
+  switch(
+    step_strategy(),
+    lazy = post_binding_lazy(source, data_object, step_id),
+    materialize = post_binding_materialize(source, data_object, step_id),
+    materialize_selective = post_binding_materialize_selective(source, data_object, step_id)
   )
 }
 

@@ -67,3 +67,7 @@ filtering in the step was applied.}
 These are methods for `cohortBuilder` generics used for integrity between source layers.
 See \link[cohortBuilder]{source-layer}.
 }
+\details{
+`.pre_filtering.db` and `.post_binding.db` delegate to the strategy selected
+by the `cohortBuilder.db.step_strategy` option. See \link{step-strategy}.
+}
