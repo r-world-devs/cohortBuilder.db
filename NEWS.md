@@ -14,6 +14,11 @@
 * Added the `vignette("step-strategy")` describing when to use each strategy.
 * Adjusted the filter and source layers to `cohortBuilder` and
   `shinyCohortBuilder` 1.0.0, which moved filter methods to S7 dual dispatch.
+* Added support for the `multi_discrete` and `datetime_range` filter types,
+  which previously failed with an S7 dispatch error on `db` sources.
+* Added `.propagate_domains.db`, so filter domains are narrowed between steps
+  the same way as for `tblist` sources. Previously the no-op default method was
+  used, leaving domains untouched.
 * Fixed range filter break computation.
 
 # cohortBuilder.db 0.2.0

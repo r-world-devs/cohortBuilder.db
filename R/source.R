@@ -77,6 +77,8 @@ set_source.db <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 #' - `.run_binding.db`: the updated `data_object_post`.
 #' - `.get_attrition_label.db` / `.get_attrition_count.db`: attrition label and
 #'   count (reused from the `tblist` implementation).
+#' - `.propagate_domains.db`: invisibly `NULL`; called for the side effect of
+#'   narrowing the step filters domains (reused from the `tblist` implementation).
 NULL
 
 #' Build the db data object (table connections) for a source
@@ -218,6 +220,20 @@ create_data_object <- function(source) {
 .get_attrition_count.db <- function(source, data_stats, dataset, ...) {
   fun <- utils::getFromNamespace(".get_attrition_count.tblist", "cohortBuilder")
   fun(source, data_stats, dataset, ...)
+}
+
+#' @param cohort Cohort object the step belongs to.
+#' @param mode Domain propagation mode, one of "filter", "stats" or "data".
+#'   See \link[cohortBuilder]{cohort}.
+#' @rdname source-layer
+#' @export
+.propagate_domains.db <- function(source, data_object, step_id, cohort, mode, ...) {
+  # The tblist implementation is source-agnostic: it only calls
+  # `cb_intersect_domain()` / `cb_intersect_domain_values()` (which dispatch on
+  # the filter alone), `cb_domain_from_stats()` and `cb_domain_from_data()` -
+  # all of which the db layer supports.
+  fun <- utils::getFromNamespace(".propagate_domains.tblist", "cohortBuilder")
+  fun(source, data_object, step_id, cohort, mode, ...)
 }
 
 #' @param code_data Data frame collecting the reproducible-code expressions.

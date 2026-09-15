@@ -6,7 +6,11 @@
 #' The package plugs into the `cohortBuilder` S7 filter generics
 #' (`cb_filter_data()`, `cb_get_filter_stats()`, ...) and the S3 source-layer
 #' generics (`.init_step()`, `.pre_filtering()`, ...) to describe how each
-#' built-in filter type and source operation behaves for a `"db"` source.
+#' filter type and source operation behaves for a `"db"` source.
+#'
+#' The following filter types are supported: `discrete`, `discrete_text`,
+#' `range`, `date_range`, `datetime_range` and `multi_discrete`. The `query`
+#' filter is not available for `db` sources.
 #'
 #' @name cohortBuilder.db-package
 #' @importFrom magrittr %>%
