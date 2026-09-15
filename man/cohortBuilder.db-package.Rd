@@ -15,7 +15,20 @@ The package plugs into the `cohortBuilder` S7 filter generics
 generics (`.init_step()`, `.pre_filtering()`, ...) to describe how each
 built-in filter type and source operation behaves for a `"db"` source.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/r-world-devs/cohortBuilder.db}
+  \item Report bugs at \url{https://github.com/r-world-devs/cohortBuilder.db/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Krystian Igras \email{krystian8207@gmail.com}
+
+Authors:
+\itemize{
+  \item Krystian Igras \email{krystian8207@gmail.com}
+}
 
 }

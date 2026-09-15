@@ -10,8 +10,8 @@ tables stores within a database.
 All of the operations are performed directly on the database server
 side!
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.1.1&color=ff69b4)](https://github.com/r-world-devs/cohortBuilder.db)
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.1.0.0&color=ff69b4)](https://github.com/r-world-devs/cohortBuilder.db)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 
 ## Installation
 
@@ -100,18 +100,30 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
+## Step strategies
+
+Each filtering step can either stay a lazy `dbplyr` query or be written
+to a temporary table before the next step reads it. The behaviour is
+controlled with a single option:
+
+``` r
+options(cohortBuilder.db.step_strategy = "lazy")                  # default, nothing is materialized
+options(cohortBuilder.db.step_strategy = "materialize")           # every table computed in every step
+options(cohortBuilder.db.step_strategy = "materialize_selective") # only tables touched by the step
+```
+
+See `vignette("step-strategy", package = "cohortBuilder.db")` for when
+to pick each one.
+
 ## Acknowledgement
 
 Special thanks to:
 
--   [Kamil Wais](mailto:kamil.wais@gmail.com) for highlighting the need
-    for the package and its relevance to real-world applications.
--   [Adam Foryś](mailto:adam.forys@gmail.com) for technical support,
-    numerous suggestions for the current and future implementation of
-    the package.
--   [Paweł Kawski](mailto:pawel.kawski@gmail.com) for indication of
-    initial assumptions about the package based on real-world medical
-    data.
+- [Kamil Wais](mailto:kamil.wais@gmail.com) for highlighting the need
+  for the package and its relevance to real-world applications.
+- [Adam Foryś](mailto:adam.forys@gmail.com) for technical support,
+  numerous suggestions for the current and future implementation of the
+  package.
 
 ## Getting help
 
