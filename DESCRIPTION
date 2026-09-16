@@ -1,37 +1,49 @@
 Package: cohortBuilder.db
 Type: Package
-Title: cohortBuilder Methods for Database Source
-Version: 0.1.1
-Authors@R: 
-    c(person('Krystian', 'Igras', 
-             email = 'krystian8207@gmail.com', 
+Title: Database Source Layer for 'cohortBuilder'
+Version: 1.0.0
+Authors@R:
+    c(person('Krystian', 'Igras',
+             email = 'krystian8207@gmail.com',
              role = c('cre', 'aut'))
     )
 Maintainer: Krystian Igras <krystian8207@gmail.com>
-Description: Add methods allowing to set up database source and apply filtering to it.
+Description: Extends 'cohortBuilder' with a source layer for database tables.
+    Cohort filtering steps are translated to 'dbplyr' queries and executed on the
+    database server, so no data needs to be pulled into R. Supports the
+    'shinyCohortBuilder' graphical interface and offers configurable strategies
+    for how intermediate step results are passed between filtering steps.
 License: MIT + file LICENSE
+URL: https://github.com/r-world-devs/cohortBuilder.db
+BugReports: https://github.com/r-world-devs/cohortBuilder.db/issues
 Encoding: UTF-8
-LazyData: true
+Language: en-US
+Depends:
+    R (>= 4.1.0)
 Imports:
     rlang,
-    yaml,
     tibble,
     purrr,
     dplyr (>= 1.0.0),
-    tidyr,
     magrittr,
     glue,
-    R6,
+    S7,
     DBI,
-    RPostgres,
     dbplyr,
-    cohortBuilder (>= 0.1.1),
+    cohortBuilder (>= 1.0.0),
+    queryBuilder,
     shinyWidgets,
-    shinyCohortBuilder (>= 0.1)
-RoxygenNote: 7.2.1
+    shinyCohortBuilder (>= 1.0.0)
 KeepSource: true
-Suggests: 
+Suggests:
     shiny,
+    shinyQueryBuilder,
     RSQLite,
+    RPostgres,
+    knitr,
+    rmarkdown,
+    withr,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

@@ -17,5 +17,11 @@ dbtables(connection, tables, schema = "public")
 Object of class 'db'.
 }
 \description{
-The object should be used as `dtconn` argument of \link{set_source}.
+The object should be used as `dtconn` argument of \link[cohortBuilder]{set_source}.
+}
+\examples{
+\dontrun{
+conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+dbtables(conn, tables = c("books", "borrowers"), schema = "cb")
+}
 }

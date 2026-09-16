@@ -10,9 +10,11 @@
 \alias{.run_binding.db}
 \alias{.get_attrition_label.db}
 \alias{.get_attrition_count.db}
+\alias{.propagate_domains.db}
+\alias{.repro_code_tweak.db}
 \title{Source compatibility methods for "db" layer.}
 \usage{
-\method{.init_step}{db}(source)
+\method{.init_step}{db}(source, ...)
 
 \method{.pre_filtering}{db}(source, data_object, step_id)
 
@@ -27,12 +29,18 @@
 \method{.get_attrition_label}{db}(source, step_id, step_filters, dataset, ...)
 
 \method{.get_attrition_count}{db}(source, data_stats, dataset, ...)
+
+\method{.propagate_domains}{db}(source, data_object, step_id, cohort, mode, ...)
+
+\method{.repro_code_tweak}{db}(source, code_data)
 }
 \arguments{
 \item{source}{Source object of "db" type.}
 
+\item{...}{Extra arguments passed to a specific method.}
+
 \item{data_object}{Object that allows source data access.
-For "db" source it's a list of connections to temporary tables in connected database.}
+For "db" source it's a list of connections to (temporary) tables in the connected database.}
 
 \item{step_id}{Id of the currently used step.}
 
@@ -46,8 +54,30 @@ filtering in the step was applied.}
 \item{dataset}{Dataset name to present attrition for.}
 
 \item{data_stats}{Data frame presenting statistics for each filtering step.}
+
+\item{cohort}{Cohort object the step belongs to.}
+
+\item{mode}{Domain propagation mode, one of "filter", "stats" or "data".
+See \link[cohortBuilder]{cohort}.}
+
+\item{code_data}{Data frame collecting the reproducible-code expressions.}
+}
+\value{
+- `.init_step.db`, `.pre_filtering.db`, `.post_binding.db`: a named list of
+  `dbplyr` table connections (the `data_object`).
+- `.collect_data.db`: a named list of collected (in-memory) tibbles.
+- `.get_stats.db`: a named list of per-dataset statistics (`n_rows`).
+- `.run_binding.db`: the updated `data_object_post`.
+- `.get_attrition_label.db` / `.get_attrition_count.db`: attrition label and
+  count (reused from the `tblist` implementation).
+- `.propagate_domains.db`: invisibly `NULL`; called for the side effect of
+  narrowing the step filters domains (reused from the `tblist` implementation).
 }
 \description{
 These are methods for `cohortBuilder` generics used for integrity between source layers.
 See \link[cohortBuilder]{source-layer}.
+}
+\details{
+`.pre_filtering.db` and `.post_binding.db` delegate to the strategy selected
+by the `cohortBuilder.db.step_strategy` option. See \link{step-strategy}.
 }

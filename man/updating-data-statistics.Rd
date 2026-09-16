@@ -5,7 +5,7 @@
 \alias{.update_data_stats.db}
 \title{Update data statistics method for db source}
 \usage{
-\method{.update_data_stats}{db}(source, step_id, cohort, session)
+\method{.update_data_stats}{db}(source, step_id, cohort, session, ...)
 }
 \arguments{
 \item{source}{Source object of db type.}
@@ -15,6 +15,11 @@
 \item{cohort}{Cohort object.}
 
 \item{session}{Shiny session object.}
+
+\item{...}{Extra arguments passed to a specific method.}
+}
+\value{
+Invisibly `NULL`; called for the side effect of updating the panel.
 }
 \description{
 Update data statistics method for db source

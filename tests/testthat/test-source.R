@@ -36,10 +36,6 @@ test_that("Filtering works fine", {
   expect_equal(nrow(coh$get_data(1, state = "pre", collect = TRUE)$books), nrow(librarian$books))
   run(coh)
   expect_equal(unique(coh$get_data(1, state = "post", collect = TRUE)$books$author), "Dan Brown")
-  expect_equal(
-    coh$get_data(1, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_1")
-  )
 
   # multiple steps
   coh <- cohort(
@@ -55,14 +51,6 @@ test_that("Filtering works fine", {
   expect_equal(nrow(coh$get_data(1, state = "pre", collect = TRUE)$books), nrow(librarian$books))
   expect_equal(unique(coh$get_data(1, state = "post", collect = TRUE)$books$author), "Dan Brown")
   expect_equal(unique(coh$get_data(2, state = "post", collect = TRUE)$borrowers$program), c("premium", NA))
-  expect_equal(
-    coh$get_data(1, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_1")
-  )
-  expect_equal(
-    coh$get_data(2, state = "post", collect = FALSE)$books$ops$x$x,
-    dbplyr::ident("books_2")
-  )
 })
 
 test_that("Binding works fine", {

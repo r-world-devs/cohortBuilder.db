@@ -2,16 +2,16 @@
 % Please edit documentation in R/gui.R
 \name{autofilter.db}
 \alias{autofilter.db}
-\title{Generate filters definition based on the Source data}
+\title{Generate filters definition based on the db Source data}
 \usage{
 \method{autofilter}{db}(source, attach_as = c("step", "meta"), ...)
 }
 \arguments{
-\item{source}{Source object.}
+\item{source}{Source object of db type.}
 
 \item{attach_as}{Choose whether the filters should be attached as a new step,
-or list of available filters (used in filtering panel when `new_step = "configure"`).
-By default in \code{step}.}
+or as a list of available filters (`"meta"`, used in the filtering panel
+when `new_step = "configure"`). By default attached as a `step`.}
 
 \item{...}{Extra arguments passed to a specific method.}
 }
@@ -19,6 +19,7 @@ By default in \code{step}.}
 Source object having step configuration attached.
 }
 \description{
-The method should analyze source data structure, generate proper filters based on
-the data (e.g. column types) and attach them to source.
+The method analyses the source data structure, generates filters based on the
+column types and attaches them to the source (as a step or as available
+filters metadata).
 }

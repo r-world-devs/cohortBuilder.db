@@ -2,14 +2,14 @@
 % Please edit documentation in R/gui.R
 \name{.available_filters_choices.db}
 \alias{.available_filters_choices.db}
-\title{Generate available filters choices based on the Source data}
+\title{Generate available filters choices based on the db Source data}
 \usage{
 \method{.available_filters_choices}{db}(source, cohort, ...)
 }
 \arguments{
-\item{source}{Source object.}
+\item{source}{Source object of db type.}
 
-\item{cohort}{cohortBuilder cohort object}
+\item{cohort}{cohortBuilder cohort object.}
 
 \item{...}{Extra arguments passed to a specific method.}
 }
@@ -17,6 +17,5 @@
 `shinyWidgets::prepare_choices` output value.
 }
 \description{
-The method should return the available choices for
-virtualSelect input.
+The method returns the available choices for the virtualSelect input.
 }

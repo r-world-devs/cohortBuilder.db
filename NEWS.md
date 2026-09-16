@@ -1,0 +1,37 @@
+# cohortBuilder.db 1.0.0
+
+* First CRAN release.
+* Added configurable step strategies controlling how a step result is handed to
+  the next step, selected with the `cohortBuilder.db.step_strategy` option
+  (`?"step-strategy"`):
+  * `"lazy"` (new default) keeps the result a lazy `dbplyr` query and never
+    writes temporary tables,
+  * `"materialize"` is the previous behaviour, computing every source table into
+    a temporary table on each step,
+  * `"materialize_selective"` computes only the tables a filter or an active
+    binding touched, and drops temporary tables without referencing the
+    `pg_temp` schema, which makes it usable on Amazon Redshift.
+* Added the `vignette("step-strategy")` describing when to use each strategy.
+* Adjusted the filter and source layers to `cohortBuilder` and
+  `shinyCohortBuilder` 1.0.0, which moved filter methods to S7 dual dispatch.
+* Added support for the `multi_discrete` and `datetime_range` filter types,
+  which previously failed with an S7 dispatch error on `db` sources.
+* Added support for the `query` filter type. Operators that `dbplyr` cannot
+  translate are rewritten to their SQL equivalents, with `contains`,
+  `begins_with` and `ends_with` mapped to `LIKE` (see `?"db-filter-query"` for
+  the resulting differences). The number of distinct values collected per column
+  for the filter specifications is limited by the new `cb_db_query_max_values`
+  option.
+* Added `.propagate_domains.db`, so filter domains are narrowed between steps
+  the same way as for `tblist` sources. Previously the no-op default method was
+  used, leaving domains untouched.
+* Fixed range filter break computation.
+
+# cohortBuilder.db 0.2.0
+
+* Added `shinyCohortBuilder` methods, so db sources can be used in the GUI.
+* Added source-layer methods for binding keys, attrition and reproducible code.
+
+# cohortBuilder.db 0.1.0
+
+* Initial version providing `dbtables()` and the `db` source layer.

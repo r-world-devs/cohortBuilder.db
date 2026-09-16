@@ -1,0 +1,270 @@
+---
+title: "Choosing a step strategy"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Choosing a step strategy}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = requireNamespace("RSQLite", quietly = TRUE)
+)
+```
+
+## What a step strategy controls
+
+Running a `cohortBuilder` step on a `db` source goes through the following stages:
+
+1. `.pre_filtering` - prepare the data object the step starts from,
+2. `cb_filter_data` - apply each of the step filters (a `dplyr::filter()` on the
+   lazy table),
+3. `.run_binding` - apply binding keys (an `inner_join()` on the key values),
+4. `.post_binding` - hand the result over to the next step.
+
+Only stages 1 and 4 are configurable. They decide whether the result of a step
+stays a lazy `dbplyr` query or is written to a temporary table in the database.
+That single decision is the *step strategy*, and it is read from an option on
+every step run:
+
+```{r, eval = FALSE}
+options(cohortBuilder.db.step_strategy = "lazy")
+```
+
+Three values are available - `"lazy"` (the default), `"materialize"` and
+`"materialize_selective"`. See `?"step-strategy"` for the reference
+documentation.
+
+| | writes temporary tables | tables written per step | drop statement |
+|---|---|---|---|
+| `lazy` | no | - | - |
+| `materialize` | yes | all source tables | `DROP TABLE pg_temp.<name>` |
+| `materialize_selective` | yes | only tables touched by a filter or an active binding | `DROP TABLE IF EXISTS <name>` |
+
+An unset option falls back to `"lazy"`; an unrecognised one falls back to
+`"lazy"` with a warning.
+
+## Example setup
+
+The examples below use the `librarian` data shipped with `cohortBuilder`,
+copied into an in-memory SQLite database.
+
+```{r setup, message = FALSE}
+library(magrittr)
+library(cohortBuilder)
+library(cohortBuilder.db)
+
+remote_names <- function(data_object) {
+  vapply(
+    data_object,
+    function(x) {
+      name <- dbplyr::remote_name(x)
+      if (is.null(name)) "<lazy>" else as.character(name)
+    },
+    character(1)
+  )
+}
+
+librarian <- cohortBuilder::librarian
+conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+DBI::dbExecute(conn, paste0("ATTACH '", tempfile(), "' AS cb"))
+for (table in c("books", "borrowers", "issues")) {
+  dplyr::copy_to(
+    conn, librarian[[table]], dbplyr::in_schema("cb", table),
+    temporary = FALSE, overwrite = TRUE
+  )
+}
+
+db_source <- set_source(
+  dbtables(tables = c("books", "borrowers", "issues"), schema = "cb", connection = conn),
+  binding_keys = bind_keys(
+    bind_key(update = data_key("issues", "isbn"), data_key("books", "isbn"))
+  )
+)
+
+new_cohort <- function() {
+  cohort(
+    db_source,
+    step(
+      filter("discrete", id = "author", variable = "author", dataset = "books",
+             value = "Dan Brown")
+    ),
+    step(
+      filter("discrete", id = "program", variable = "program", dataset = "borrowers",
+             value = "premium")
+    )
+  )
+}
+```
+
+## Case 1: shallow cohort over large tables - `"lazy"`
+
+With `"lazy"` nothing is ever copied. Each step returns the lazy query it
+received, so `get_data()` or `get_stats()` push a single (nested) query to the
+database.
+
+```{r}
+options(cohortBuilder.db.step_strategy = "lazy")
+
+coh <- new_cohort()
+run(coh)
+
+remote_names(coh$get_data(2, state = "post", collect = FALSE))
+coh$get_data(2, state = "post", collect = FALSE)$issues %>%
+  dplyr::show_query()
+```
+
+No table has a remote name - every object is still a query over the original
+`cb.*` tables. The `issues` query also shows the nesting the binding key adds on
+top of the filter.
+
+Pick this when:
+
+* the cohort has few steps, so query nesting stays manageable,
+* the source tables are large enough that copying them would be more expensive
+  than re-deriving the filter,
+* the user changes filters often and rarely collects the data (a `shiny` app
+  where only counts are refreshed),
+* the database has no writable temporary schema at all.
+
+The trade-off is that every additional step adds another level of subquery.
+With many steps plus bindings, the final statement grows and the database has to
+re-evaluate the whole chain on each collect.
+
+## Case 2: deep cohort, data collected repeatedly - `"materialize"`
+
+`"materialize"` is the original behaviour of the package: `.post_binding` calls
+`dplyr::compute()` for **every** source table, so a step's result is stored as
+`<table>_<step_id>` and the next step reads from that.
+
+```{r}
+options(cohortBuilder.db.step_strategy = "materialize")
+
+coh <- new_cohort()
+run(coh)
+
+dbplyr::remote_name(coh$get_data(1, state = "post", collect = FALSE)$books)
+dbplyr::remote_name(coh$get_data(2, state = "post", collect = FALSE)$books)
+```
+
+Each step now starts from a flat table, so the SQL stays shallow no matter how
+many steps are defined:
+
+```{r}
+coh$get_data(2, state = "post", collect = FALSE)$books %>%
+  dplyr::show_query()
+```
+
+Pick this when:
+
+* the cohort has many steps and the nested query would become the bottleneck,
+* the same step result is read many times (attrition plots, statistics for every
+  filter in the GUI, repeated `get_data()` calls),
+* the filtered result is much smaller than the source table.
+
+The trade-off is that a step costs a full scan and a write of *every* source
+table, even tables no filter in that step touches. On a source with a dozen
+tables and a filter on one of them, eleven tables are copied for nothing.
+
+## Case 3: many tables, few of them filtered - `"materialize_selective"`
+
+`"materialize_selective"` materializes only the tables whose row set actually
+changed in the step. The `"filtered"` attribute, set by `cb_filter_data()` and by
+`.run_binding()` when the binding is activated, marks those tables. Untouched
+tables are returned as they came in, which means they point at the previous
+step's object.
+
+```{r}
+options(cohortBuilder.db.step_strategy = "materialize_selective")
+
+coh <- new_cohort()
+run(coh)
+
+remote_names(coh$get_data(1, state = "post", collect = FALSE))
+remote_names(coh$get_data(2, state = "post", collect = FALSE))
+```
+
+In step 1 the `author` filter touches `books`, and the binding key propagates
+that to `issues`, so both are written to `cb_tmp_books_1` and `cb_tmp_issues_1`.
+`borrowers` was untouched and is left alone. In step 2 only `borrowers` is
+filtered, so only it is written, while `books` and `issues` keep pointing at the
+step 1 temporary tables.
+
+Note that bound tables **must** be materialized rather than reverted to the
+previous step - otherwise the binding join would be lost.
+
+Pick this when:
+
+* the source has many tables but each step filters only one or two of them,
+* you want the flat-SQL benefit of `"materialize"` without paying for full scans
+  of untouched tables,
+* the database rejects the `pg_temp`-qualified drop used by `"materialize"`
+  (see below).
+
+## Case 4: databases without a `pg_temp` schema (e.g. Redshift)
+
+`"materialize"` cleans up in `.pre_filtering` with
+`DBI::dbRemoveTable(temporary = TRUE)`, which `RPostgres` emits as
+`DROP TABLE pg_temp.<name>`. Amazon Redshift has no `pg_temp` schema, so that
+statement fails and the step errors out on re-run.
+
+Both other strategies are safe there:
+
+* `"lazy"` never drops anything,
+* `"materialize_selective"` issues an unqualified
+  `DROP TABLE IF EXISTS cb_tmp_<table>_<step_id>`, resolved through the search
+  path. The `cb_tmp_` prefix keeps the statement from ever naming a real table.
+
+```{r, eval = FALSE}
+# Redshift-friendly configuration
+options(cohortBuilder.db.step_strategy = "materialize_selective")
+```
+
+## Case 5: switching strategies mid-session
+
+The option is read on every step run, not when the source or cohort is created,
+so it can be changed at any time. Re-run the flow afterwards to rebuild the data
+objects under the new strategy.
+
+```{r}
+options(cohortBuilder.db.step_strategy = "lazy")
+coh <- new_cohort()
+run(coh)
+
+options(cohortBuilder.db.step_strategy = "materialize")
+run(coh)
+dbplyr::remote_name(coh$get_data(2, state = "post", collect = FALSE)$books)
+```
+
+To scope the change to a single block of code, reset the option on exit:
+
+```{r, eval = FALSE}
+withr::with_options(
+  list(cohortBuilder.db.step_strategy = "materialize"),
+  run(coh)
+)
+```
+
+## Things to keep in mind
+
+* Temporary tables live for the lifetime of the database connection. Closing and
+  reopening the connection invalidates the materialized data objects, so re-run
+  the cohort flow.
+* Both materializing strategies drop their temporary tables in `.pre_filtering`,
+  which is why re-running a step works. Dropping is unconditional, so leftovers
+  from an earlier run in the same connection are cleared as well.
+* The two materializing strategies use different naming schemes
+  (`<table>_<step_id>` versus `cb_tmp_<table>_<step_id>`). Switching between them
+  without a re-run can leave the earlier scheme's tables behind until the
+  connection is closed.
+* `"materialize"` names its temporary tables `<table>_<step_id>`, which can clash
+  with an existing table of that name. If your schema has such names, prefer
+  `"materialize_selective"`.
+
+```{r, include = FALSE}
+options(cohortBuilder.db.step_strategy = NULL)
+DBI::dbDisconnect(conn)
+```
