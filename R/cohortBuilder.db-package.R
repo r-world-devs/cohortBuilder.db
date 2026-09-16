@@ -9,8 +9,12 @@
 #' filter type and source operation behaves for a `"db"` source.
 #'
 #' The following filter types are supported: `discrete`, `discrete_text`,
-#' `range`, `date_range`, `datetime_range` and `multi_discrete`. The `query`
-#' filter is not available for `db` sources.
+#' `range`, `date_range`, `datetime_range`, `multi_discrete` and `query`.
+#'
+#' @section Options:
+#' - `cb_db_query_max_values` - maximum number of distinct values collected per
+#'   column when computing `query` filter specifications (500 by default), see
+#'   [db-filter-query].
 #'
 #' @name cohortBuilder.db-package
 #' @importFrom magrittr %>%

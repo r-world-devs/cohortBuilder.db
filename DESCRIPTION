@@ -31,11 +31,13 @@ Imports:
     DBI,
     dbplyr,
     cohortBuilder (>= 1.0.0),
+    queryBuilder,
     shinyWidgets,
     shinyCohortBuilder (>= 1.0.0)
 KeepSource: true
 Suggests:
     shiny,
+    shinyQueryBuilder,
     RSQLite,
     RPostgres,
     knitr,

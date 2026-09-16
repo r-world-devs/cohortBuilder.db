@@ -16,6 +16,12 @@
   `shinyCohortBuilder` 1.0.0, which moved filter methods to S7 dual dispatch.
 * Added support for the `multi_discrete` and `datetime_range` filter types,
   which previously failed with an S7 dispatch error on `db` sources.
+* Added support for the `query` filter type. Operators that `dbplyr` cannot
+  translate are rewritten to their SQL equivalents, with `contains`,
+  `begins_with` and `ends_with` mapped to `LIKE` (see `?"db-filter-query"` for
+  the resulting differences). The number of distinct values collected per column
+  for the filter specifications is limited by the new `cb_db_query_max_values`
+  option.
 * Added `.propagate_domains.db`, so filter domains are narrowed between steps
   the same way as for `tblist` sources. Previously the no-op default method was
   used, leaving domains untouched.
