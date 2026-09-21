@@ -5,12 +5,13 @@
 #' `tblist` behaviour, but operate lazily on `dbplyr` table connections
 #' (statistics are pulled with `dplyr::collect()`).
 #'
-#' @param filter A `cohortBuilder` query filter (`CbFilterQuery`).
-#' @param source A `db` source object.
-#' @param data_object Named list of `dbplyr` table connections.
-#' @param name Optional statistic name(s) to compute.
-#' @param cache_object Cached statistics used to derive default parameter values.
-#' @param ... Extra arguments.
+#' @section Method arguments:
+#' - `filter`: A `cohortBuilder` query filter (`CbFilterQuery`).
+#' - `source`: A `db` source object.
+#' - `data_object`: Named list of `dbplyr` table connections.
+#' - `name`: Optional statistic name(s) to compute.
+#' - `cache_object`: Cached statistics used to derive default parameter values.
+#' - `...`: Extra arguments.
 #'
 #' @section Limitations:
 #' `queryBuilder::queryToExpr()` renders some operators as R functions that have

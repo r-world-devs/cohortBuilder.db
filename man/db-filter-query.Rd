@@ -3,19 +3,6 @@
 \name{db-filter-query}
 \alias{db-filter-query}
 \title{Query filter methods for the `db` source}
-\arguments{
-\item{filter}{A `cohortBuilder` query filter (`CbFilterQuery`).}
-
-\item{source}{A `db` source object.}
-
-\item{data_object}{Named list of `dbplyr` table connections.}
-
-\item{name}{Optional statistic name(s) to compute.}
-
-\item{cache_object}{Cached statistics used to derive default parameter values.}
-
-\item{...}{Extra arguments.}
-}
 \value{
 - `cb_filter_data`: the filtered `data_object`.
 - `cb_get_filter_stats`: a named list (or single value) of statistics.
@@ -29,6 +16,16 @@ They dispatch on `list(CbFilterQuery, db_class)` and mirror the built-in
 `tblist` behaviour, but operate lazily on `dbplyr` table connections
 (statistics are pulled with `dplyr::collect()`).
 }
+\section{Method arguments}{
+
+- `filter`: A `cohortBuilder` query filter (`CbFilterQuery`).
+- `source`: A `db` source object.
+- `data_object`: Named list of `dbplyr` table connections.
+- `name`: Optional statistic name(s) to compute.
+- `cache_object`: Cached statistics used to derive default parameter values.
+- `...`: Extra arguments.
+}
+
 \section{Limitations}{
 
 `queryBuilder::queryToExpr()` renders some operators as R functions that have
