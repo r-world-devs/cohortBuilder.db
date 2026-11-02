@@ -9,6 +9,11 @@ An S7 S3-class wrapper created with [S7::new_S3_class()].
 \usage{
 db_class
 }
+\value{
+An S7 S3-class object (class `"S7_S3_class"`) representing the
+  `"db"` source class. Used only for method dispatch; not intended to be
+  called or instantiated directly.
+}
 \description{
 S7 representation of the `db` source class. Used as the source side of the
 `cohortBuilder` S7 dual-dispatch filter generics when registering methods,

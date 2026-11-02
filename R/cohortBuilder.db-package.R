@@ -35,6 +35,9 @@ utils::globalVariables(c(
 #' e.g. `S7::method(cb_filter_data, list(CbFilterDiscrete, db_class))`.
 #'
 #' @format An S7 S3-class wrapper created with [S7::new_S3_class()].
+#' @return An S7 S3-class object (class `"S7_S3_class"`) representing the
+#'   `"db"` source class. Used only for method dispatch; not intended to be
+#'   called or instantiated directly.
 #' @keywords internal
 #' @export
 db_class <- S7::new_S3_class("db")
